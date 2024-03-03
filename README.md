@@ -8,19 +8,15 @@ uvicorn app:app --reload
 
 # To upload on server 
 
-Исходя из предоставленных вами конфигураций, замечены следующие вопросы:
-
-1. **Необходимый Symlink**: После создания файла `myapp.service` в директории `/etc/systemd/system/`, вам нужно также создать символическую ссылку (symlink) в директории `/etc/systemd/system/` для этого сервиса. Это можно сделать с помощью следующей команды:
+1. **Необходимый Symlink**: После создания файла `myapp.service` в директории `/etc/systemd/system/`, нужно также создать символическую ссылку (symlink) в директории `/etc/systemd/system/` для этого сервиса. Это можно сделать с помощью следующей команды:
    
    ```bash
    sudo ln -s /etc/systemd/system/myapp.service /etc/systemd/system/multi-user.target.wants/myapp.service
    ```
 
-2. **Использование Supervisor**: Похоже, что вы также используете Supervisor для управления приложением. Однако, при использовании systemd, Supervisor становится излишним. Вам следует выбрать один из методов управления процессами (systemd или Supervisor), чтобы избежать конфликтов.
+2. **Права доступа**: Убедиться, что пользователь, указанный в секции `[Service]` вашего файла `myapp.service`, имеет необходимые права доступа к директории и файлам, необходимым для запуска FastAPI приложения.
 
-3. **Права доступа**: Убедитесь, что пользователь, указанный в секции `[Service]` вашего файла `myapp.service`, имеет необходимые права доступа к директории и файлам, необходимым для запуска вашего FastAPI приложения.
-
-После принятия вышеуказанных изменений, перезагрузите systemd и попробуйте запустить ваш сервис:
+Далее перезагрузить systemd и запустить сервис:
 
 ```bash
 sudo systemctl daemon-reload
@@ -34,7 +30,7 @@ sudo systemctl start myapp
 journalctl -xe
 ```
 
-Чтобы ваше FastAPI приложение продолжало работать после того, как вы выключите терминал или выйдете из сайта сервера, вам следует использовать менеджер процессов, такой как `supervisord` или `systemd`.
+Чтобы FastAPI приложение продолжало работать после того, как выключится терминал или сайта сервера, следует использовать менеджер процессов, такой как `supervisord` или `systemd`.
 
 1. **Supervisord**:
    - Установите supervisord: `sudo apt-get install supervisor`
@@ -48,10 +44,10 @@ journalctl -xe
      stderr_logfile=/var/log/myapp.err.log
      stdout_logfile=/var/log/myapp.out.log
      ```
-   - Запустите supervisord: `sudo service supervisor start`
+   - Запустить supervisord: `sudo service supervisor start`
 
 2. **Systemd**:
-   - Создайте systemd unit файл, например, `myapp.service` в директории `/etc/systemd/system/`:
+   - Создайть systemd unit файл, например, `myapp.service` в директории `/etc/systemd/system/`:
      ```
      [Unit]
      Description=My FastAPI App
@@ -66,7 +62,7 @@ journalctl -xe
      [Install]
      WantedBy=multi-user.target
      ```
-   - Загрузите и активируйте сервис: 
+   - Загрузить и активировать сервис: 
      ```
      sudo systemctl daemon-reload
      sudo systemctl enable myapp
